@@ -1,32 +1,165 @@
-# TODO — Scrapy Base Template
+# Scrapy-TUyanik TODO
 
-## In Progress
+Task shape follows the house discipline in `d:/AwakenAnalytics/Backtesting/CLAUDE.md` §"TODO.md discipline" (TAG heading → `Goal (user)` blockquote → checkbox sub-tasks with file paths + acceptance criteria → `⚠` ties line). **No `<!--board:-->` tags here** — `gen_board.py` only reads `Backtesting/TODO.md` (verified at `gen_board.py:23-24`) and does not see this file.
 
-## Backlog
+---
 
-## Done
+# ═══ ACTIVE ═══
 
-### Fix: Items
-- [x] Replace `from resumes.items import ResumesItem` in both spiders with `from custom.items import CustomItem`
-- [x] Add common field stubs to `CustomItem` (name, link, description, field, url, timestamp)
+## TVSRC — Scrape TradingView Pine source for the 762-row strategy library (NEW 2026-07-25, user)
 
-### Refactor: User Agents
-- [x] Create `custom/user_agents.txt` — one UA string per line (moved from `CustomPlaywright.py`)
-- [x] Add utility functions in `custom/custom/utils.py` — `load_user_agents()`, `random_user_agent()`, `load_proxies()`, `random_proxy()`
-- [x] Update `CustomPlaywright.py` to use `random_user_agent()` from utils
-- [x] `Custom.py` uses same utility (available via import when needed)
+> **Goal (user):** "I am creating a knowledgebase about indicators & strategies from tradingview. Here is my previous scraping results TradingViewStrategies.csv. I need to visit url's in that csv file and I need to scrape Source Code tab for each strategies. We can visit the website via browserharness for selectors and solving the response part."
 
-### Structure: Test Folder
-- [x] Created `testfolder/` at project root with `.gitkeep`
-- [x] Added `testfolder/*` to `.gitignore` (keeps folder, ignores output files)
+⚠ **THIS IS THE IMPLEMENTATION VEHICLE FOR `TVLIB-1` IN `Backtesting/TODO.md` — NOT a new initiative.** Verified 2026-07-25: `TradingViewStrategies.csv` (762 rows) and `Backtesting/datastore/source/StrategyLibrary.csv` (762 rows) resolve to the **same 705 unique URLs with zero symmetric difference** — same dataset, not merely the same row count. TVLIB-1 already specs this scrape and TVLIB-2 consumes its output via `Backtesting/scripts/utils/parse_pinescript.py`. **The only change is the venue** — TVLIB-1 assumed a hand-rolled `scripts/utils/scrape_tradingview_library.py`; we build a Scrapy spider here instead, because this repo already is the scraping template. **Do not open a second TradingView-scrape task in `Backtesting/TODO.md`.**
 
-### Stub: Proxy Support
-- [x] Create `custom/proxies.txt` — commented format guide, gitignored
-- [x] `random_proxy()` utility in `utils.py` — returns None if file empty
-- [x] Commented-out `ProxyMiddleware` class in `middlewares.py` with activation instructions
+⚠ **TVLIB-0 IS ANSWERED HERE, IN FULL, FOR BOTH SIDES OF THE HANDOFF — it is not left open anywhere.** Scrapy side: `ScrapyTUyanik/datastore/pine/<slug>.pine` (TVSRC-0). Backtesting side: `Backtesting/datastore/source/pine/<slug>.pine` (TVSRC-4). Both gitignored, both with a verification gate. There is no "whatever path TVLIB-0 settles on" — that decision is made, written down, and the only remaining act is to mark TVLIB-0 `[x]` when TVSRC-4 lands.
 
-### New Spider: API-Based Scraping
-- [x] Created `custom/spiders/CustomAPI.py` — REST API template
-  - Auth via `API_KEY` env var (Bearer token)
-  - Dual pagination: follows `next` URL or increments page number
-  - Maps response fields to `CustomItem`
+⚠ **RECON, 2026-07-25 — the `Evidence` column is load-bearing. A `census n=705` row may be built on without checking. An `n=1` or `n=6` row is a WORKING HYPOTHESIS and carries a named validation gate below. Do not treat the two as the same grade of fact.**
+
+| Fact | Measured value | Evidence |
+|---|---|---|
+| Rows / unique URLs | **762 rows, 705 unique** (57 duplicate URLs) | **census n=705** |
+| Same dataset as `StrategyLibrary.csv` | URL sets identical, **zero symmetric difference** (705 == 705) | **census n=705** |
+| URL shape | `/script/<8charId>[-<slug>]/` — 705/705 carry an 8-char id; **602 have a trailing slug, 103 do NOT** (`.../script/01DBv9uI/`, `.../script/2Bt3ns4g/`). ⚠ **14.6% of the corpus has no slug — any file-naming scheme keyed on "text after the id" loses them.** | **census n=705** |
+| Page fetch | **HTTP 200, no auth, no JS, ~300 KB** → plain `Custom.py` archetype, **NOT Playwright** | n=6 sample |
+| Source location | Page HTML is **not** where the Pine lives. It embeds a publication id `PUB;[0-9a-f]{32}`; the source comes from a second host. | n=6 sample |
+| Source endpoint | `https://pine-facade.tradingview.com/pine-facade/get/PUB%3B<hash>/last` → JSON `{source, scriptName, scriptAccess, version, created, updated, lastVersionMaj, extra}` | n=6 sample |
+| **⚠ Multi-PUB pages — WORKING HYPOTHESIS (n=1), NOT a measured fact** | Some pages carry 2–3 `PUB;` ids. Hypothesis: **first in document order = the target script**; the rest are imported libraries. Single supporting observation, page `kGSi6ONc`: target `Volume Delta + RSI Confluence Signals` 2,031 chars, then libs `RelativeValue` 12,323 and `ta` 64,860. **Taking the longest, or the last, silently scrapes a library instead of the strategy.** ⚠ **Validated at scale by the TVSRC-2 name-check gate — that gate is the only thing standing between this hypothesis and 705 wrong files.** | **n=1 page** |
+| Wrong id trap | The URL's 8-char id (`1Y6Sh7dJ`) is **NOT** a pine-facade id → `404 pine_facade failed to get pine source`. The page's `scriptIdPart` field is often a `USER;<hash>` → `"The user requesting information on the script is not allowed to do so"`. **Only the `PUB;<hash>` works.** | n=2 probes |
+| robots.txt (`www.tradingview.com`) | `/script/*` is **allowed** for `User-agent: *`; disallowed only for AI-training crawlers (ClaudeBot, GPTBot, PerplexityBot…). Scrapy is not a named crawler, so `User-agent: *` applies and `ROBOTSTXT_OBEY = True` **passes** — leave it on. | docs (robots.txt read) |
+| robots.txt (`pine-facade.tradingview.com`) | **NOT CHECKED.** Different host, own robots.txt. See the STOP policy in TVSRC-1. | **unknown** |
+| Throughput | 705 × 2 hops = ~1,410 requests. At `DOWNLOAD_DELAY=1` / `CONCURRENT_REQUESTS_PER_DOMAIN=1` ≈ **24 min**. Acceptable — do not raise concurrency. | derived |
+| Failure modes | **404 dead/removed script (1 of 6 sampled)**, protected `scriptAccess`, multi-PUB. ⚠ **n=6 supports "dead scripts exist", NOT a rate.** Do not read 1/6 as "17% will 404" — the true rate is unknown until TVSRC-2 measures it, and **no acceptance criterion in this task depends on that projection.** | **n=6 sample** |
+
+### ⚠ CANONICAL PATHS — stated once, used verbatim by every sub-task
+
+**All data lives under the repo root, never under `custom/`, and every script anchors on `__file__` — NEVER on cwd.** `custom/` holds code only. This kills two live traps: `../../TradingViewStrategies.csv` silently resolves to the wrong place when run from the repo root instead of `custom/`, and a cwd-relative `testfolder/` from a spider running in `custom/` would create a **second, un-gitignored `custom/testfolder/`** while the reporter reads the root one (`testfolder/` is at the repo ROOT — see this repo's `CLAUDE.md:20`, which writes it as `../testfolder/output.json`).
+
+```python
+# Identical preamble in custom/build_tv_worklist.py, custom/report_tv_source.py,
+# custom/pine_to_md.py, and the spider.
+from pathlib import Path
+ROOT = Path(__file__).resolve().parents[1]      # -> ScrapyTUyanik/   (spider: parents[3])
+
+SRC_CSV   = ROOT.parent / 'TradingViewStrategies.csv'   # TradingView/TradingViewStrategies.csv
+WORKLIST  = ROOT / 'datastore' / 'tv_urls.csv'
+PINE_DIR  = ROOT / 'datastore' / 'pine'                 # <slug>.pine
+JSONL     = ROOT / 'testfolder' / 'tv_source.jsonl'
+REPORT    = ROOT / 'testfolder' / 'tv_source_report.md'
+```
+
+⚠ **Encoding is not optional on this box.** Python's default `open()` codec here is **cp1254** — Pine sources routinely carry Turkish/Cyrillic/CJK comments and em-dashes, so a default-codec write crashes or mojibakes hundreds of URLs in, and the resume logic then treats corrupt rows as done. **Every `open()` in every script above passes `encoding='utf-8'` explicitly**; `.pine` files are written `newline=''` (LF); JSONL rows use `json.dumps(..., ensure_ascii=False)`.
+
+---
+
+- [x] **TVSRC-0 — Build the URL worklist + freeze the storage contract, BEFORE writing spider logic (MINOR — but it GATES everything, and its absence is what killed the last attempt).** ⚠ TVLIB's root-cause was `BacktestStrategies.md` vanishing, which stranded 679 of 762 rows at 10.9% extraction; the contract exists so that cannot recur. Write `custom/build_tv_worklist.py` (~25 lines, canonical preamble above): read `SRC_CSV` → dedupe on `url` (**762 → 705**, keep first occurrence, carry `title` for the TVSRC-2 name check) → emit `WORKLIST` (cols: `url, title, slug`).
+
+  **⚠ `slug` DEFINITION — pinned, because it is the primary key of the entire Pine filesystem and both intuitive readings destroy data.** `slug = url.rstrip('/').rsplit('/', 1)[-1]` — **the whole final path segment, 8-char id included**. Verified against the real 705: **705/705 unique, 0 collisions even case-insensitively (NTFS-safe), max length 70 chars, all ASCII**, characters limited to `[A-Za-z0-9_%-]`. Three URLs carry percent-escapes (`uY9EBtHq-RSI-1H-afi%C8%99at-pe-3M`) — **keep them escaped, do NOT `unquote`** (unquoting reintroduces non-ASCII filenames). ⚠ **Rejected alternatives, do not re-derive:** "text after the 8-char id" is **empty for 103 of 705 URLs** and **collides across 12 groups** (`Trent-Finder-V3`, `Midnight-30min-High-Low` ×3, `Pre-Market-High-and-Low`, `PSX-OBV-Divergence-Labels-1D`, …) — collisions overwrite `.pine` files **silently**, leaving the JSONL row count at a healthy-looking 705 while `datastore/pine/` holds fewer files. The CSV `title` is not filesystem-safe.
+
+  **Storage contract (user-chosen 2026-07-25, do not re-litigate):** audit log at `JSONL`, **one row per attempted URL including every failure**, schema `{url, slug, pub_id, script_name, script_access, version, created, updated, source_available, source_len, source_path, pub_selection, error}`; Pine text at `PINE_DIR/<slug>.pine`, written **only** where source is present. Record the contract + the canonical-paths preamble in the spider's module docstring.
+
+  **⚠ `.gitignore` — required, not cosmetic, and the obvious entry does NOT work.** Git anchors any pattern containing a mid-string slash to the directory of the `.gitignore` itself, so a bare `datastore/pine/` line is fragile the moment anything moves under `custom/`. The existing rules cover **none** of what this task produces: `*.jl` does **not** match `.jsonl`, `*.json` does **not** match `.jsonl`, and `testfolder/*` is root-anchored. Without this, ~700 third-party Pine files get committed — the exact ToS/IP tripwire TVLIB-0 exists to prevent. Add these **unanchored** lines verbatim:
+  ```gitignore
+  **/datastore/pine/
+  *.pine
+  *.jsonl
+  ```
+  ✅ **ALREADY APPLIED 2026-07-25** (`.gitignore:22-25`) and **proven**, not assumed — `git check-ignore -v` matches all three of `datastore/pine/x.pine`, `testfolder/tv_source.jsonl`, and `custom/datastore/pine/y.pine` (the last is the case an anchored `datastore/pine/` would have missed). **Do not re-add these lines.**
+
+  **Acceptance:** `WORKLIST` has exactly **705** rows; `len(set(slugs)) == 705` asserted in the script itself, not by eye; `git check-ignore -v datastore/pine/x.pine` and `git check-ignore -v testfolder/tv_source.jsonl` both report a matching rule; `git status --porcelain` after a run shows **zero** untracked `.pine` / `.jsonl`; the docstring states the chosen paths, the reason, and that they are gitignored deliberately.
+
+- [x] **TVSRC-1 — Write the two-hop spider `custom/custom/spiders/TradingViewSource.py` (MAJOR).** Fork `Custom.py` (plain HTTP — the recon table settles the archetype; **do not reach for `CustomPlaywright.py`**). Declare `class TradingViewSourceSpider(scrapy.Spider): name = "tvsource"` — ⚠ **state the `name` explicitly; the repo has three inconsistent casings to copy from (`CustomSpider`, `custompw`, `CustomAPI`) and the acceptance command below depends on it.**
+
+  **Hop 1:** GET each `WORKLIST` url → `PUB_RE.search(response.text)`, **first match only**, per the multi-PUB hypothesis. ⚠ **Harden the regex — the naive `r'PUB;[0-9a-f]{32}'` carries two unstated assumptions:** it is lowercase-only (an uppercase hex id yields a false `no_pub_id`), and it assumes `PUB;` appears unescaped in raw HTML, which is not guaranteed when the id sits inside an embedded JSON blob (`PUB%3B`, `PUB\u003B`). Use:
+  ```python
+  PUB_RE = re.compile(r'PUB(?:;|%3B|\\u003[Bb])([0-9a-fA-F]{32})')   # capture group 1 = hash
+  ```
+  **Hop 2:** `yield Request(f'https://pine-facade.tradingview.com/pine-facade/get/PUB%3B{pub_hash}/last', cb_kwargs={...})` → `json.loads` → write `.pine` + JSONL row.
+
+  **⚠ Terminal rows MUST be written from hop 1 too — the contract says "one row per attempted URL including failures", and a hop-2-only write silently loses them.** The `no_pub_id` case never reaches hop 2, and the recon's own "Wrong id trap" row guarantees it happens (pages exposing only `USER;<hash>`). Same for a hop-1 HTTP error. Rule: **if hop-1 yields no `PUB;` match, or returns non-2xx, `yield` a terminal JSONL row immediately (`pub_id=None, source_available=False, error='no_pub_id'|'http_error'`) and do NOT issue hop 2.** Attach `errback=` to **both** Requests so DNS/timeout failures produce a row instead of vanishing into Scrapy's log. Without this, TVSRC-2's sum-to-705 gate fails for a reason nobody will diagnose.
+
+  **⚠ Resumability — skip on TERMINAL status, not on "no error".** The naive rule ("skip urls already logged with `error is None`") re-fetches every failed row on **every** restart: a `dead_404` script is dead forever, a `protected` script is protected forever, yet both carry a non-None `error`. On a run this doc says **will** be interrupted, that re-burns the whole failure set each resume and never converges. Rule: **on start, read `JSONL` and skip urls whose logged `error` is in the TERMINAL set `{None, 'dead_404', 'protected', 'no_pub_id'}`; retry only `{'http_error', 'json_error'}`.**
+
+  **Rate limits + UA.** ⚠ **SUPERSEDED 2026-07-25 — `DOWNLOAD_DELAY` is 5, and the UA is a single stable one set via `USER_AGENT`, NOT `random_user_agent()`. See the override block below before acting on this sentence.** Keep `DOWNLOAD_DELAY = 1` and `CONCURRENT_REQUESTS_PER_DOMAIN = 1`; `custom_settings` adds `RETRY_TIMES = 2` and `HTTPERROR_ALLOWED_CODES = [404]` so a dead script becomes a logged row, not a dropped one. ⚠ **Wire the UA — `Custom.py` sets none, so the fork would ship the default `Scrapy/x.y (+https://scrapy.org)` for 1,410 requests to TradingView.** The robots verdict survives that (Scrapy is not a named AI crawler), but this task's own stated real risk is "a careless crawler gets the account banned", and an unmasked default Scrapy UA is precisely that. `from custom.utils import random_user_agent` → `headers={'User-Agent': random_user_agent()}` on every Request. One import, one kwarg.
+
+  **⚠ robots.txt STOP policy — this is a decision, not an observation.** `pine-facade.tradingview.com` is a **different host** from `www.tradingview.com`, with its own robots.txt and its own per-domain delay bucket. **If pine-facade's robots.txt disallows `/pine-facade/get/`: STOP and escalate to the user. Do NOT set `ROBOTSTXT_OBEY: False`, and do NOT proceed on the reasoning that the data is public.** Record the disallow line verbatim as a dated line in this task block. If it allows, note that and continue. ⚠ **SUPERSEDED 2026-07-25 — this gate FIRED and was then overridden by the user; `ROBOTSTXT_OBEY` IS now `False` in the spider's `custom_settings`. See the override block immediately below.**
+
+  > **🛑 2026-07-25 — THE STOP GATE FIRED, AND WAS THEN OVERRIDDEN BY THE USER. The three instructions struck through below are NO LONGER CURRENT; do not re-read them as live.**
+  >
+  > `https://pine-facade.tradingview.com/robots.txt` returned HTTP 200 with, verbatim and in full:
+  > ```
+  > User-agent: *
+  > Disallow: /
+  > ```
+  > A blanket disallow covering `/pine-facade/get/` — the only known route to Pine source. Per the policy above, execution stopped and escalated. The user was shown the disallow line and responded: **"Pass the robot.txt file"** (2026-07-25), an explicit instruction to proceed after the concern was raised. Treated as the user's decision and executed. **The ToS/account-ban risk is the user's to carry and they carried it knowingly; server-load courtesy was kept in force regardless.** Note that robots.txt is a voluntary crawler convention, not an access control — the endpoint is public and unauthenticated, and no login or protection was bypassed.
+  >
+  > **Three deviations follow from the override. They supersede the spec text in this block:**
+  > 1. ~~"Do NOT set `ROBOTSTXT_OBEY: False`"~~ → **`ROBOTSTXT_OBEY: False`, scoped to the spider's `custom_settings` ONLY.** `custom/custom/settings.py:22` remains `True` — the override does not leak to other spiders in this template repo.
+  > 2. ~~"keep `DOWNLOAD_DELAY = 1`"~~ → **`DOWNLOAD_DELAY = 5`** (user: *"Delay can be 5 sec"*) — more polite than specced. ⚠ The "~24 min" throughput row in the recon table above is therefore stale; the real run is ~1–2 h.
+  > 3. ~~"`headers={'User-Agent': random_user_agent()}` on every Request"~~ → **one stable browser UA via the `USER_AGENT` setting.** Rotating 200 UAs while deliberately ignoring robots.txt is detection-evasion shaped and buys nothing here; the spec's only stated reason for the UA line was avoiding the bare `Scrapy/x.y` default, which one stable UA satisfies. ⚠ Set via `USER_AGENT`, **not** `DEFAULT_REQUEST_HEADERS` — the latter *replaces* Scrapy's default `{Accept, Accept-Language}`, producing a Chrome UA with no Accept headers, a signature no real browser sends and more bot-shaped than the default it replaces.
+  >
+  > Full context, mitigations, and the review rounds: `docs/reviews/auto-2026-07-25-tvsrc/`.
+
+  **⚠ Early abort → TVSRC-3, decided on the 20-URL slice, NOT after the full run.** On the slice, **if >2 of 20 fail with a non-404 HTTP error, or 0 of 20 match `PUB_RE`** → stop, do not start the full run, go to TVSRC-3. Also report the slice's `no_pub_id` count; **if it is >2, re-derive the regex against saved HTML in `HTML_Files/` before the full run** rather than accepting the losses.
+
+  **Acceptance:** `cd custom && scrapy crawl tvsource` over a **20-URL slice** produces exactly 20 JSONL rows (successes *and* failures) with zero unhandled exceptions; every non-null `source` starts with `//` and is `> 200` chars; **at least one captured `.pine` containing a non-ASCII byte round-trips** (write → read → compare); killing the run mid-way and restarting issues **`705 − len(terminal rows)`** requests — ⚠ **assert this against the terminal count, not against the success count; a success-path-only test lets the resume bug pass the gate.**
+
+- [~] **TVSRC-2 — Full run over all 705 + a report that names the misses (MAJOR).** Run to completion, then `custom/report_tv_source.py` (canonical preamble) writes `REPORT` and prints the counts. ⚠ **A bare "we captured N" is NOT done** — that phrasing says nothing about the ones we missed, and it is the specific failure TVLIB-2's acceptance criteria call out.
+
+  **⚠ Reason codes are NOT mutually exclusive — apply this priority ladder, first match wins:** `no_pub_id` (hop-1 regex miss) > `dead_404` (**hop-1 OR hop-2 HTTP 404** — amended, see below) > `http_error` (any other non-2xx, either hop) > `json_error` (2xx, unparseable body) > `protected` (**parsed, but no usable source returned** — amended, see below) > `captured`. Without the ladder a dead script is classifiable two ways and the totals stop reconciling.
+
+  > **⚠ 2026-07-25 — TWO LADDER RUNGS AMENDED AGAINST MEASUREMENT. Both changes are implemented in the spider and documented in its module docstring.**
+  >
+  > **(a) `dead_404` now covers hop-1 404s too, and stays TERMINAL.** As originally worded, a hop-1 404 fell to `http_error` and was retried on every resume, forever. Measured on the live run: **64 of 144 rows (44%) were hop-1 404s** — 7× the n=6 recon guess, so it was hand-verified rather than accepted. 4 of the 404 urls, fetched individually with `curl` (no crawl): 404 with a bare browser UA **and** with full `Accept`/`Accept-Language` (→ not a header-fingerprint artifact) · 404 on the id-only `/script/<id>/` form with an **empty** `redirect_url` (→ not a stale/renamed slug) · a known-good control url returned 200 in the same batch (→ not a block or rate-limit onset) · 404s interleave with captures throughout emit order rather than forming a contiguous tail (→ not "banned at time T"). **These scripts are genuinely removed from TradingView**, so TERMINAL is correct and retrying them forever would have been the bug. ⚠ This **supersedes** the n=6 failure-mode row in the recon table, which explicitly claimed only "dead scripts exist, NOT a rate" — the honesty gate did its job.
+  >
+  > **(b) `protected` now means "no usable source came back", not `scriptAccess != open_no_auth`.** The original wording conflates the access *label* with whether source was actually *returned*; obeying it literally would **discard source the facade successfully handed us** merely because the label reads `open` rather than `open_no_auth`. Data loss is the larger blast radius, so source is kept whenever it arrives and `script_access` is recorded on every row. `report_tv_source.py` tallies the access labels and flags any non-`open_no_auth` capture, so the distinction stays visible instead of silent.
+
+  **Acceptance — the identity that must hold:**
+  ```
+  captured + dead_404 + protected + no_pub_id + http_error + json_error == 705
+  attempted == 705            # reported separately, NOT a term in the sum
+  ```
+  ⚠ The earlier "the five counts sum to 705" formulation was unsatisfiable under either set of five it could mean (`attempted` is 705 by definition; the reason codes exclude `captured`) — use the six-term identity above and nothing else.
+
+  **⚠ Name-check gate — this is the ONLY validation of the n=1 first-PUB hypothesis.** Compare pine-facade `scriptName` against the CSV `title` under a **stated** normalization so the number is reproducible: **casefold → strip non-alphanumerics → collapse whitespace**. A mismatch rate **above 5%** means the first-PUB hypothesis is wrong at scale. **Remedy, named now so nobody invents one under pressure:** on each mismatched row, re-resolve by fetching **all** `PUB;` ids on that page and selecting the one whose `scriptName` best matches the CSV `title` (normalized Levenshtein); log `pub_selection='by_name'` on those rows (`'first'` otherwise). ⚠ Do **not** lower the threshold instead — longest and last are already ruled out by the recon, so by-name is the only fallback left.
+
+  **Acceptance:** `REPORT` exists; the six-term identity holds exactly; `attempted == 705` stated separately; mismatch rate stated **with an explicit pass/fail call against the 5% line** and, if failed, the `pub_selection='by_name'` re-resolution run and its new mismatch rate reported; ≥10 captured `.pine` files spot-checked by eye against their page.
+
+- [ ] **TVSRC-3 — browser-harness fallback, ONLY if a TVSRC-1 slice trigger fires (MINOR, conditional — do not pre-build).** ⚠ The user offered browser-harness for selector work; **recon showed the plain-HTTP path already works end to end**, so this stays unbuilt unless a trigger fires. ⚠ **Triggers are evaluated on TVSRC-1's 20-URL slice, before the full run** — a trigger computable only after TVSRC-2 has burned all 1,410 requests cannot prevent a failed run, which was the whole point. Triggers, any one: **>2 of 20 slice URLs fail with a non-404 HTTP error** (⚠ **404s are excluded — those are `dead_404`, an expected outcome, not a failure**; `HTTPERROR_ALLOWED_CODES = [404]` makes this distinction load-bearing) · **0 of 20 match `PUB_RE`** (TV changed its embed) · a Cloudflare/JS interstitial appears. Then: `browser-harness` per `~/Developer/browser-harness/SKILL.md` → `new_tab(<a failing script url>)` → `capture_screenshot()` → locate the **Source Code** tab in the page UI → `js(...)` to read the rendered source block, and check `interaction-skills/network-requests.md` for capturing the pine-facade XHR directly. **Acceptance (only if triggered):** the new selector or endpoint is written into TVSRC-1's spider **and** appended to this task block as a dated recon line with its own `Evidence` grade, so the next breakage starts from the fix rather than from scratch.
+
+- [ ] **TVSRC-4 — Hand the output to `Backtesting` TVLIB-2 and close the loop (MAJOR — upgraded from MINOR: this is a real code change plus a live IP tripwire, not a copy).**
+
+  > **⏸ DEFERRED 2026-07-25 BY USER DECISION — NOT STARTED, NOTHING IN `Backtesting/` WAS TOUCHED.**
+  > Asked at the start of the `--auto` run which of the four `Backtesting/` writes were pre-authorized. User answered: *"Write the todos in /ScrapyTUyanik/TODO.md file. We can do the actions later"*. **No authorization was given for any cross-repo write, so none happened.** `Backtesting/.gitignore`, `Backtesting/BacktestStrategies.md`, `parse_pinescript.py`, `extract_strategy_rules.py`, and `Backtesting/TODO.md` are all **unmodified**. The four steps below are the deferred work, kept here as an explicit checklist so nothing is lost. Run context: `docs/reviews/auto-2026-07-25-tvsrc/`.
+  >
+  > - [ ] **TVSRC-4a — gitignore the destination FIRST.** `Backtesting/.gitignore` is `*.csv` + `!datastore/source/*.csv` with **no `.pine` rule**, and `datastore/source/` is a **deliberately tracked** directory. Add `datastore/source/pine/`, then verify `git check-ignore -v datastore/source/pine/x.pine` reports a matching rule. ⚠ **No file is copied until that command passes** — otherwise ~700 third-party Pine files land in a tracked tree, the exact ToS/IP outcome TVLIB-0 exists to prevent. (`Backtesting/` is confirmed its own git repo, so the command is runnable there.)
+  > - [ ] **TVSRC-4b — copy the captures.** `ScrapyTUyanik/datastore/pine/<slug>.pine` → `Backtesting/datastore/source/pine/<slug>.pine`. ⚠ Run `python custom/report_tv_source.py` first: it normalizes any Windows separators left in `source_path` (deferred until the crawl completes by design) and re-checks the six-term identity. Copy from a clean report, not mid-run.
+  > - [ ] **TVSRC-4c — bridge the format, because `parse_pinescript.py` cannot read a directory.** It reads ONE markdown file via a single `open()` (`parse_pinescript.py:23` + `:505`) and splits it with `parse_md_blocks()` (`:461`, header regex `:458`). Write `custom/pine_to_md.py` (~20 lines) emitting exactly: `## Strategy N: <title>` / `### TV Source Code` / *pine verbatim* / `---`. ⚠ **`<title>` MUST be the CSV `title`, NOT pine-facade's `scriptName`** — `main()` matches blocks into `StrategyLibrary_rules.csv` by exact `title` string (`:556`), so a `scriptName` silently matches zero rows and reports 0 with no error. ⚠ **This matters more than it did when written:** the name-check gate found **36 rows where facade `scriptName` differs from the CSV title** — publication-name-vs-`title=` drift, with 10 of them unresolved. ⚠ **Do NOT read that as "renamed"** — `by_name` was 0 and 26 of the 36 were shown *not* to be renames (2 matched the file's own `shorttitle`, 24 were single-id pages). The operative fact for this sub-task is simply that **the two name fields genuinely differ on real rows**, so using `scriptName` here would match zero CSV rows.
+  > - [ ] **TVSRC-4d — fix `BACKTESTING_DIR`, then run and report.** `parse_pinescript.py:21` and `extract_strategy_rules.py:44` both set it to `Backtesting/scripts/` instead of `Backtesting/` (one `dirname` short — re-verified 2026-07-25). **Nothing is findable until that is fixed**, so a "0 extracted" result is that bug, not a bad scrape. Then report `extracted_conditions` non-null before/after (⚠ baseline **83 of 762 = 10.9%**), explain the delta, and give every still-empty row a reason code (`protected` / `qualitative` / `parse_failed`). Finally mark TVLIB-0 and TVLIB-1 `[x]` in `Backtesting/TODO.md` with the TVSRC-2 counts inline and a pointer to this file.
+
+  **⚠ GATE 1 — gitignore the destination BEFORE copying a single file.** `Backtesting/.gitignore` is `*.csv` + `!datastore/source/*.csv` with **no `.pine` rule**, and `datastore/source/` is a **deliberately tracked** directory. Copying as-is commits ~700 third-party Pine files into the Backtesting repo — the identical ToS/IP tripwire TVSRC-0 guards upstream, landing here instead. Add `datastore/source/pine/` to `Backtesting/.gitignore`, then verify with `git check-ignore -v datastore/source/pine/x.pine`. **No copy happens until that command reports a matching rule.** Destination is `Backtesting/datastore/source/pine/<slug>.pine` — pinned, see the TVLIB-0 note at the top of this block.
+
+  **⚠ GATE 2 — `parse_pinescript.py` cannot read a directory of `.pine` files. "Point it at it" is not a constant edit.** It reads **one markdown file** via a single `open()` (`parse_pinescript.py:23` + `:505`) and splits it with `parse_md_blocks()` (`:461`, header regex `:458`). Cheapest bridge, chosen: write `custom/pine_to_md.py` (~20 lines, canonical preamble) that concatenates `PINE_DIR/*.pine` into `Backtesting/BacktestStrategies.md` in **exactly** the format the existing parser expects — do not touch the parser's block logic:
+  ```markdown
+  ## Strategy 1: <title>
+  ### TV Source Code
+  <pine source, verbatim>
+  ---
+  ```
+  ⚠ **`<title>` MUST be the CSV `title` verbatim, NOT pine-facade's `scriptName`** — `main()` matches blocks into `StrategyLibrary_rules.csv` by exact `title` string (`row.get('title','').strip()`, `:556`), so a `scriptName` here silently matches zero rows and the extraction reports 0 with no error. Header regex is `^## Strategy \d+: (.+)$` and the block terminator is a line that is exactly `---`.
+
+  **⚠ GATE 3 — fix-on-touch, already diagnosed in TVLIB-2, do not skip.** `parse_pinescript.py:21` and `extract_strategy_rules.py:44` both set `BACKTESTING_DIR = dirname(SCRIPT_DIR)` → `Backtesting/scripts/` instead of `Backtesting/` (one `dirname` too few). **They cannot find anything until that is fixed** — so a "0 extracted" result after this handoff is that bug, not a bad scrape.
+
+  **Acceptance:** `git check-ignore -v` passes on the destination **before** any copy; `BacktestStrategies.md` regenerated with one block per captured `.pine` and its block count equals the `captured` count from TVSRC-2; `extracted_conditions` non-null count in `StrategyLibrary_rules.csv` reported **before and after** (⚠ baseline **83 of 762 = 10.9%**), the delta explained, and every still-empty row carrying a reason code (`protected` / `qualitative` / `parse_failed`); `Backtesting/TODO.md` updated — TVLIB-0 marked `[x]` (answered by the TVLIB-0 note at the top of this block), TVLIB-1 marked `[x]` with the TVSRC-2 counts inline and a pointer back to this file.
+
+- ✅ **OUTCOME 2026-07-25 — TVSRC-0/-1/-2 DONE, -3 not triggered, -4 deferred. Full record: `docs/reviews/auto-2026-07-25-tvsrc/`.**
+  **Counts:** attempted **705** · captured **360** (51.1%) · `dead_404` **345** (48.9%) · `protected` **0** · `no_pub_id` **0** · `http_error` **0** · `json_error` **0** · identity `360+345+0+0+0+0 == 705` **OK** · **360 `.pine` on disk, 1:1 with captured rows**. Corpus 3.0 M chars / 4 MB — indicator 319, strategy 29, library 12; Pine v6 197 / v5 153 / untagged 10.
+  **Name-check gate:** raw SUSPECT **36/360 = 10.00% FAIL** → remedy run (`resolve_suspects.py --apply`, verdicts in `testfolder/tv_source_verdicts.json`) — ⚠ **DEVIATION from this task's own acceptance text above: verdicts live in that SIDECAR, not in `pub_selection`. `pub_selection` in the jsonl remains `'first'` on all 360 captured rows and is NOT the verdict field.** Rationale (preserving the append-only audit log) in `05-TVSRC-2.md`; every verdict persists the ids it was decided on, so all 26 clearances are re-derivable offline with zero requests → `first_sole` 24 · `title_match` 2 · **`unresolved` 10** · `by_name` **0** · `id_changed`/`indeterminate`/`fetch_error` 0 → **residual 10/360 = 2.78% PASS**.
+  ⚠ **Say this precisely: ZERO CONFIRMED WRONG-PUB CAPTURES, WITH 10 ROWS UNRESOLVED.** Not "validated with zero counterexamples" — the 10 are multi-id pages where no candidate name matches the CSV title above 0.80, and name evidence cannot separate rename from mis-pick there. An earlier resolver reported these same 10 as confirmed renames; a score floor turned a false clearance into an honest flag.
+  ⚠ **The n=1 multi-PUB hypothesis (recon row above) is now supported at n=360 but NOT proven** — no counterexample was found, 10 rows could not be checked by this method.
+  ⚠ **`dead_404` at 48.9% supersedes the n=6 recon guess.** Primary evidence is a **38-url repeat measurement at zero extra cost**: the concurrent-crawler operator error fetched 77 urls twice from independent processes at different times — **0/77 disagreed on reason code**, 38 were `dead_404` in both, 0/39 captured-both differed in `source_len`. Corroborated by 4 hand-checked urls (404 with and without Accept headers; 404 on the id-only form with empty redirect; control 200; interleaved not tailed) and by a near-uniform dead rate across id-only (55.3%) vs slug (47.8%) urls.
+  ⚠ **TVSRC-1's `> 200 chars` acceptance was WRONG and is retired** — 2 captures fall under it and both are complete valid scripts (one is genuinely `indicator("123")` / `plot(close)`). Replace with "starts with `//` and parses a declaration". Recorded rather than quietly dropped.
+  ⚠ **Open follow-ups:** the 10 `unresolved` rows and the report's 37 `needs_eye` flags are a review queue, not defects. **A future run should persist hop-1 HTML for flagged rows** so the multi-PUB discriminator is replayable offline — it currently re-fetches hours after the pick and cannot prove "one id NOW" equals "one id THEN".
+
+- ⚠ **Ties + honesty gates.** Upstream: **`Backtesting/TODO.md` → TVLIB-0/-1/-2/-3** (this task IS TVLIB-1's implementation; TVLIB-3 consumes the extraction), **`INDOC`** (the unmappable-indicator list is the same build queue), **`CBT`** (consumes a mapped library — TVSRC stops at captured source and **does not run any backtest**). Files: `custom/custom/spiders/Custom.py` (fork base), `custom/custom/settings.py` (`ROBOTSTXT_OBEY`, `DOWNLOAD_DELAY`), `custom/custom/utils.py::random_user_agent` + `custom/user_agents.txt`, `Backtesting/scripts/utils/parse_pinescript.py`. ⚠ **ToS / IP gate — carried over from TVLIB-1 verbatim, do not drop it:** TradingView's terms restrict automated scraping and published Pine remains author IP (TV open-source publications carry MPL-2.0 by convention). Constraints: **throttle and stay resumable, never parallel-hammer** (a careless crawler gets the account banned — that is the real risk, not a legal one) · **personal research use only** · **keep `url` + `pub_id` on every row for attribution** · **do NOT republish scraped source** · **both gitignore gates (TVSRC-0, TVSRC-4 GATE 1) are part of this gate, not housekeeping.** ⚠ **Prior-art gate:** the 762 rows of curated typing in `StrategyLibrary.csv` (`backtestable`, `strategy_type`, `timeframe_class`) were expensive to produce — **enrich those rows, never regenerate them.** ⚠ **Scope fence:** deepen the existing 705 only; a broader community-script crawl is out of scope (locked by user on TVLIB, 2026-07-24).
+- ⚠ **Review history.** Reviewed 2026-07-25 by `/brutally-honest-review` (independent read-only subagent) → **REVISE**, 6 CRITICAL / 9 MAJOR / 3 MINOR. All 18 applied 2026-07-25. Full report: `docs/reviews/2026-07-25-tvsrc-todo-review.md`. ⚠ **The review's own path fix contained an off-by-one** (`ROOT.parent.parent` for `SRC_CSV`; correct is `ROOT.parent`, since `ROOT` resolves to `ScrapyTUyanik/`) — the canonical-paths block above carries the corrected form. ⚠ **What the review confirmed as sound, so it is not re-litigated:** the 762/705 census, the zero-symmetric-difference dataset identity, every TVLIB cross-claim, the `BACKTESTING_DIR` bug at both files, and the `gen_board.py` exemption.

@@ -1,0 +1,270 @@
+{
+  "https://www.tradingview.com/script/iNpKsdYt/": {
+    "verdict": "title_match",
+    "matched_field": "SCTI-MACD",
+    "score": null
+  },
+  "https://www.tradingview.com/script/n7OXjXv8-ZFT-Classic/": {
+    "verdict": "title_match",
+    "matched_field": "ZFT Classic",
+    "score": null
+  },
+  "https://www.tradingview.com/script/7H1DGxKV-ORB-Range-Indicator-with-Fibonacci-Targets/": {
+    "verdict": "unresolved",
+    "ids": 2,
+    "score": 0.507,
+    "winner_is_captured": true,
+    "captured": "473453110c3b4c8e89ef32da305dfa80",
+    "all_ids": [
+      "473453110c3b4c8e89ef32da305dfa80",
+      "b4a4f5f3491c4415880607e8f5f50de1"
+    ]
+  },
+  "https://www.tradingview.com/script/XFStl5Pg/": {
+    "verdict": "first_sole",
+    "ids": 1,
+    "id": "3766cf4ffef948fca12df4ff6d1e8f4b",
+    "captured": "3766cf4ffef948fca12df4ff6d1e8f4b"
+  },
+  "https://www.tradingview.com/script/bzZIooYd/": {
+    "verdict": "unresolved",
+    "ids": 4,
+    "score": 0.375,
+    "winner_is_captured": true,
+    "captured": "2cc70d26a0814cc882cec474109266e5",
+    "all_ids": [
+      "2cc70d26a0814cc882cec474109266e5",
+      "2c6d0390762a42a684d798aa878c4675",
+      "63202329a04c4056a171b456d7b77065",
+      "40add3df60ef4c9ea1e15c4cde58d95b"
+    ]
+  },
+  "https://www.tradingview.com/script/itrqFcIl/": {
+    "verdict": "first_sole",
+    "ids": 1,
+    "id": "8d3d57d6a91b4204a07f880215aa14ed",
+    "captured": "8d3d57d6a91b4204a07f880215aa14ed"
+  },
+  "https://www.tradingview.com/script/M7opHh7K-Weekly-Change-Screener-5-Sell-Threshold/": {
+    "verdict": "first_sole",
+    "ids": 1,
+    "id": "5ca971c0ca9846ef9e9ffd28f8896c4e",
+    "captured": "5ca971c0ca9846ef9e9ffd28f8896c4e"
+  },
+  "https://www.tradingview.com/script/JRqtd0Zr-AO-AC-Zones-Log-Price/": {
+    "verdict": "unresolved",
+    "ids": 3,
+    "score": 0.5,
+    "winner_is_captured": true,
+    "captured": "45093f0e9d1c4a61811dfe8af8161453",
+    "all_ids": [
+      "45093f0e9d1c4a61811dfe8af8161453",
+      "5e6d054f3f354726ad1f9feb8e59032f",
+      "a9d0bbba261a4cce91a22983bb4ba1b4"
+    ]
+  },
+  "https://www.tradingview.com/script/8wXrFmYZ-Momentum-Reversal-Strategy/": {
+    "verdict": "first_sole",
+    "ids": 1,
+    "id": "96011aa6f3ce4b60812eba2471f6f588",
+    "captured": "96011aa6f3ce4b60812eba2471f6f588"
+  },
+  "https://www.tradingview.com/script/dj78jmEN-Zeefreaks-Predator-Mask-Crypto/": {
+    "verdict": "first_sole",
+    "ids": 1,
+    "id": "7bb7830c27234fa2b6b940ea69777fa9",
+    "captured": "7bb7830c27234fa2b6b940ea69777fa9"
+  },
+  "https://www.tradingview.com/script/lyCTgr1L/": {
+    "verdict": "first_sole",
+    "ids": 1,
+    "id": "e41e807c139c4fb4a9ebcbcf06387ed1",
+    "captured": "e41e807c139c4fb4a9ebcbcf06387ed1"
+  },
+  "https://www.tradingview.com/script/lmCaTAPv/": {
+    "verdict": "first_sole",
+    "ids": 1,
+    "id": "42d8c018ccc84b15afd421f1f06a1887",
+    "captured": "42d8c018ccc84b15afd421f1f06a1887"
+  },
+  "https://www.tradingview.com/script/9yxmTRPA-Multi-Timeframe-SMT/": {
+    "verdict": "first_sole",
+    "ids": 1,
+    "id": "d8469e33ee0d4aeb94170c793e3e2d54",
+    "captured": "d8469e33ee0d4aeb94170c793e3e2d54"
+  },
+  "https://www.tradingview.com/script/WtaFZGLB/": {
+    "verdict": "first_sole",
+    "ids": 1,
+    "id": "37dbfdf7bd90446d88a255ba4ec4d89c",
+    "captured": "37dbfdf7bd90446d88a255ba4ec4d89c"
+  },
+  "https://www.tradingview.com/script/hZUbIp7I-Big-Candle/": {
+    "verdict": "first_sole",
+    "ids": 1,
+    "id": "0d79aa71dada4ab4a842990b726825b2",
+    "captured": "0d79aa71dada4ab4a842990b726825b2"
+  },
+  "https://www.tradingview.com/script/u3RhMjMd-Relative-Strength-Line-by-Ankit-Prajapati/": {
+    "verdict": "first_sole",
+    "ids": 1,
+    "id": "0461d4d36fb644dab876f10a40f8fac2",
+    "captured": "0461d4d36fb644dab876f10a40f8fac2"
+  },
+  "https://www.tradingview.com/script/cBP2lt0d-RSI-Long-Only-with-Confirmed-Crossbacks/": {
+    "verdict": "first_sole",
+    "ids": 1,
+    "id": "60a0a4b5ff214e079741e9879642934b",
+    "captured": "60a0a4b5ff214e079741e9879642934b"
+  },
+  "https://www.tradingview.com/script/3oS2DPqQ-Sessions-13-Zones-ValentijnJelte/": {
+    "verdict": "first_sole",
+    "ids": 1,
+    "id": "916a5125cf7a41a2a8ae879663318d83",
+    "captured": "916a5125cf7a41a2a8ae879663318d83"
+  },
+  "https://www.tradingview.com/script/0sjcsPgM-Supply-Demand-Zones-Fixed-v3-Cross-YES-Only/": {
+    "verdict": "first_sole",
+    "ids": 1,
+    "id": "fe4572fa033e46b8936edaff30fa106d",
+    "captured": "fe4572fa033e46b8936edaff30fa106d"
+  },
+  "https://www.tradingview.com/script/O4apDjnm-Previous-Day-Levels-High-Low-Open-Close/": {
+    "verdict": "unresolved",
+    "ids": 3,
+    "score": 0.512,
+    "winner_is_captured": true,
+    "captured": "4ffd88044d224fd9b8c4e346dbe477dc",
+    "all_ids": [
+      "4ffd88044d224fd9b8c4e346dbe477dc",
+      "ad986dbf0a4843fe84e76bb013ca7fb0",
+      "40d343a4f0f34097b3868cc13a1d4511"
+    ]
+  },
+  "https://www.tradingview.com/script/28E07V1U-Prev-Candle-Quarters-MTF-Price/": {
+    "verdict": "first_sole",
+    "ids": 1,
+    "id": "9208186ee79746959c2928678b6fec7f",
+    "captured": "9208186ee79746959c2928678b6fec7f"
+  },
+  "https://www.tradingview.com/script/L5AVnfam-Discord-Levels-Label-Toggle/": {
+    "verdict": "first_sole",
+    "ids": 1,
+    "id": "96b3f68d0eae4c59ad12f144b0f4f6e4",
+    "captured": "96b3f68d0eae4c59ad12f144b0f4f6e4"
+  },
+  "https://www.tradingview.com/script/fUzq426Q-Previous-Candle-High-Low-Clean/": {
+    "verdict": "unresolved",
+    "ids": 2,
+    "score": 0.675,
+    "winner_is_captured": true,
+    "captured": "a9fa870dbb9548c0a4256c6aab159a05",
+    "all_ids": [
+      "a9fa870dbb9548c0a4256c6aab159a05",
+      "0b06925f650940fba1d8d7c0d8e484dd"
+    ]
+  },
+  "https://www.tradingview.com/script/Y50HrNyB/": {
+    "verdict": "first_sole",
+    "ids": 1,
+    "id": "7074a21dd88648338bb76b9c6b8c8c3c",
+    "captured": "7074a21dd88648338bb76b9c6b8c8c3c"
+  },
+  "https://www.tradingview.com/script/rP6UBHNp-SPY-QQQ-VIX-Status-Table/": {
+    "verdict": "first_sole",
+    "ids": 1,
+    "id": "10320d08f7e34ea99f5e04c045b95715",
+    "captured": "10320d08f7e34ea99f5e04c045b95715"
+  },
+  "https://www.tradingview.com/script/57i9oK2t-Twin-Range-Filter-Buy-Sell-Signals/": {
+    "verdict": "first_sole",
+    "ids": 1,
+    "id": "2a5ec37e1acf4cc38f9f09b532b9e44c",
+    "captured": "2a5ec37e1acf4cc38f9f09b532b9e44c"
+  },
+  "https://www.tradingview.com/script/18LGpqXT/": {
+    "verdict": "first_sole",
+    "ids": 1,
+    "id": "28346ad96f634a38ab71ad2e33ba4ef6",
+    "captured": "28346ad96f634a38ab71ad2e33ba4ef6"
+  },
+  "https://www.tradingview.com/script/29RV8RAj-PayBack-by-Catboy/": {
+    "verdict": "unresolved",
+    "ids": 2,
+    "score": 0.583,
+    "winner_is_captured": true,
+    "captured": "aabe92bb2a2042f5b129ab44f5a8cfaa",
+    "all_ids": [
+      "aabe92bb2a2042f5b129ab44f5a8cfaa",
+      "5750fa33755748f289c419cacf29a08c"
+    ]
+  },
+  "https://www.tradingview.com/script/HwniNkOM-Nebula-by-Catboy/": {
+    "verdict": "unresolved",
+    "ids": 2,
+    "score": 0.545,
+    "winner_is_captured": true,
+    "captured": "fe652576428144d49b3762340f17a365",
+    "all_ids": [
+      "fe652576428144d49b3762340f17a365",
+      "5750fa33755748f289c419cacf29a08c"
+    ]
+  },
+  "https://www.tradingview.com/script/eHu68rVD-Daily-EMA-21-34-50/": {
+    "verdict": "first_sole",
+    "ids": 1,
+    "id": "b5e4a1dd63e2455482a33de2004851b3",
+    "captured": "b5e4a1dd63e2455482a33de2004851b3"
+  },
+  "https://www.tradingview.com/script/KULW7WSA/": {
+    "verdict": "unresolved",
+    "ids": 2,
+    "score": 0.434,
+    "winner_is_captured": true,
+    "captured": "d9627234774e436eb4d99a0dfdca9a3a",
+    "all_ids": [
+      "d9627234774e436eb4d99a0dfdca9a3a",
+      "646f8a26e85b405fb01d7600fd48bcb9"
+    ]
+  },
+  "https://www.tradingview.com/script/hi9fLmaP-123-Toolkit/": {
+    "verdict": "first_sole",
+    "ids": 1,
+    "id": "067315490c5d40d89e4e703c7fb2ece2",
+    "captured": "067315490c5d40d89e4e703c7fb2ece2"
+  },
+  "https://www.tradingview.com/script/R3y6mh9a-Improved-Weinstein-Stage-Analysis/": {
+    "verdict": "unresolved",
+    "ids": 2,
+    "score": 0.675,
+    "winner_is_captured": true,
+    "captured": "811ac55a9148416caa09e6ada2abb902",
+    "all_ids": [
+      "811ac55a9148416caa09e6ada2abb902",
+      "dca6ec9a27e9407393636c9fdd6e1486"
+    ]
+  },
+  "https://www.tradingview.com/script/gjQ5aBFB-Volume-Bars-Shubhashish-Dixit/": {
+    "verdict": "unresolved",
+    "ids": 2,
+    "score": 0.783,
+    "winner_is_captured": true,
+    "captured": "67f481bd84e34426917d18bee1feb3d0",
+    "all_ids": [
+      "67f481bd84e34426917d18bee1feb3d0",
+      "aeeb47e38c2948c3bed03d3117910204"
+    ]
+  },
+  "https://www.tradingview.com/script/j9FH2RoA-nikki-es-2m/": {
+    "verdict": "first_sole",
+    "ids": 1,
+    "id": "8a11ae295739413ba9da1d5460ef12de",
+    "captured": "8a11ae295739413ba9da1d5460ef12de"
+  },
+  "https://www.tradingview.com/script/mZI09xFI-nikki-ES-2m/": {
+    "verdict": "first_sole",
+    "ids": 1,
+    "id": "b05eba08a71347b3b9eba8deedff0128",
+    "captured": "b05eba08a71347b3b9eba8deedff0128"
+  }
+}
