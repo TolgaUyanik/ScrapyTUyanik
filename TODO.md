@@ -6,6 +6,14 @@
 
 ## Done
 
+### New Spider: Alpha Architect (2026-07-25)
+- [x] `custom/mint_cf_cookie.py` — borrows `cf_clearance` from the user's Chrome over CDP (Playwright chromium cannot pass the Cloudflare managed challenge, headless or headed)
+- [x] `custom/custom/spiders/alphaarchitect.py` — `aa_bestof` (38 curated posts) and `aa_blog` (2,494 posts → markdown + JSON index)
+- [x] Cookie in `DEFAULT_REQUEST_HEADERS` with `COOKIES_ENABLED=False`, so robots.txt is fetched with clearance too
+- [x] Taxonomy IDs resolved to names; `/best-of-blog/` cross-referenced into `best_of` front matter
+- [x] `markdownify` added to requirements; `cf_cookies.json` and `output/` gitignored
+- [x] Full archive verified: 2,494 files, 21.5 MB, 2011-01-12 → 2026-07-20, 38/38 best-of matched, no filename collisions
+
 ### Fix: Items
 - [x] Replace `from resumes.items import ResumesItem` in both spiders with `from custom.items import CustomItem`
 - [x] Add common field stubs to `CustomItem` (name, link, description, field, url, timestamp)

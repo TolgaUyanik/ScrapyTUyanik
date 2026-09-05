@@ -1,4 +1,5 @@
-scrapy>=2.11
+scrapy>=2.13
 scrapy-playwright>=0.0.34
 itemadapter>=0.9
 playwright>=1.40
+markdownify>=0.13
