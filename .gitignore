@@ -1,20 +1,20 @@
-# Scrapy output and cache
-testfolder/*
-!testfolder/.gitkeep
-HTML_Files/*
-!HTML_Files/.gitkeep
-custom/.scrapy/
-*.jl
-*.csv
-*.json
-*.xml
+# # Scrapy output and cache
+# testfolder/*
+# !testfolder/.gitkeep
+# HTML_Files/*
+# !HTML_Files/.gitkeep
+# custom/.scrapy/
+# *.jl
+# *.csv
+# *.json
+# *.xml
 
-# Proxy list (may contain credentials)
-custom/proxies.txt
+# # Proxy list (may contain credentials)
+# custom/proxies.txt
 
-# Python
-__pycache__/
-*.pyc
-*.pyo
-.venv/
-venv/
+# # Python
+# __pycache__/
+# *.pyc
+# *.pyo
+# .venv/
+# venv/
